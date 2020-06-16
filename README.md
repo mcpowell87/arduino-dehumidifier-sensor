@@ -1,0 +1,2 @@
+# Dehumidifier Sensor
+This is a simple arduino project that sends the dehumidifier status to home assistant via MQTT.  It does this by using a photoresistor attached to the LED that flashes when the dehumidifier's bucket is full.
