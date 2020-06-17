@@ -77,7 +77,7 @@ void loop() {
   }
 }
 
-int readLdr() {
+void readLdr() {
   int currentLdrRead = analogRead(LDRPIN);
   int currentTime = millis();
 
