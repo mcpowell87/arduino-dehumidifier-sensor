@@ -48,6 +48,13 @@ DHT dht(DHTPIN, DHTTYPE, 15);
 // Bug workaround for Arduino 1.6.6, it seems to need a function declaration
 // for some reason (only affects ESP8266, likely an arduino-builder bug).
 void MQTT_connect();
+void readLdr();
+int getLedState(int ldrReading);
+void readDht();
+void connectWifi();
+void publishTemp(float temp, float humidity);
+void publishBucketStatus(bool flashing);
+void reconnectMqtt();
 
 void setup() {
   flashCount = 0;
