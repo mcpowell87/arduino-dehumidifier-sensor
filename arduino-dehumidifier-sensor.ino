@@ -73,6 +73,9 @@ void loop() {
   if (!mqttClient.connected()) {
     reconnectMqtt();
   }
+  if (WiFi.status() != WL_CONNECTED) {
+    connectWifi();
+  }
   delay(LDR_READ_INTERVAL);
 
   readLdr();
