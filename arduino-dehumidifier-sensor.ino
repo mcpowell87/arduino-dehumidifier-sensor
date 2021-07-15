@@ -10,6 +10,7 @@
 #define WLAN_PASS SECRET_WLAN_PASS
 #define MQTT_SERVER SECRET_MQTT_SERVER
 #define MQTT_PORT SECRET_MQTT_PORT
+#define HOSTNAME SECRET_HOSTNAME
 
 #define MQTT_TOPIC_TEMP "home/sensor/dehumidifier/temp"
 #define MQTT_TOPIC_BUCKET_STATUS "home/sensor/dehumidifier/bucket_status"
@@ -25,7 +26,7 @@ PubSubClient mqttClient;
 #define CAPTURE_INTERVAL 5000 //4 seconds
 #define LDRPIN A0
 
-#define LED_ON_THRESHOLD 300
+#define LED_ON_THRESHOLD 200
 #define FLASH_RATE 1000
 
 #define LED_ON 1
@@ -55,6 +56,7 @@ void connectWifi();
 void publishTemp(float temp, float humidity);
 void publishBucketStatus(bool flashing);
 void reconnectMqtt();
+void reconnectWifi();
 
 void setup() {
   flashCount = 0;
@@ -70,11 +72,12 @@ void setup() {
 }
 
 void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    reconnectWifi();
+  }
+  
   if (!mqttClient.connected()) {
     reconnectMqtt();
-  }
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWifi();
   }
   delay(LDR_READ_INTERVAL);
 
@@ -165,10 +168,10 @@ void readDht() {
 }
 
 void connectWifi() {
-  Serial.println();
-  Serial.println();
   Serial.print("Connecting to ");
   Serial.println(WLAN_SSID);
+  WiFi.setAutoReconnect(true);
+  WiFi.hostname(HOSTNAME);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WLAN_SSID, WLAN_PASS);
   
@@ -181,6 +184,8 @@ void connectWifi() {
   Serial.println("WiFi connected");  
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  Serial.println("RSSI: ");
+  Serial.println(WiFi.RSSI());
 }
 
 void publishTemp(float temp, float humidity) {
@@ -215,5 +220,13 @@ void reconnectMqtt() {
       Serial.println(" try again in 5 seconds");
       delay(5000);
     }
+  }
+}
+
+void reconnectWifi() {
+  while (!WiFi.status() == WL_CONNECTED) {
+    WiFi.disconnect();
+    connectWifi();
+    delay(1000);
   }
 }
